@@ -319,15 +319,11 @@ Parameters:
   DBEngineVersion:
     Description: Select Database Engine Version.
     Type: String
-    Default: 16.8
+    Default: 16.9
     AllowedValues:
-      - 13.18
-      - 13.19
-      - 14.15
-      - 15.10
-      - 16.7
-      - 16.8
-      - 17.2
+      - 14.16
+      - 15.11
+      - 16.9
       - 17.3
   DBExportLogToCloudwatch:
     Default: ''
