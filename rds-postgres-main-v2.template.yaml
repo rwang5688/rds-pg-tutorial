@@ -389,6 +389,32 @@ Resources:
       RouteTableId: !Ref PrivateRouteTable1
       SubnetId: !Ref PrivateSubnet3
 
+  # Bastion Host IAM Role for SSM Session Manager
+  BastionHostRole:
+    Condition: EnableBastionAccess
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-BastionHostRole"
+
+  # Instance Profile for Bastion Host
+  BastionHostInstanceProfile:
+    Condition: EnableBastionAccess
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref BastionHostRole
+
   # Bastion Host Security Group
   BastionSecurityGroup:
     Condition: EnableBastionAccess
@@ -401,6 +427,17 @@ Resources:
           FromPort: 22
           ToPort: 22
           CidrIp: !Ref RemoteAccessCIDR
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+          Description: HTTPS outbound for SSM
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+          Description: HTTP outbound for package updates
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName}-BastionSG"
@@ -411,11 +448,19 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: !Sub '{{resolve:ssm:/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64}}'
-      InstanceType: t3.micro
+      InstanceType: t3.small
       KeyName: !Ref KeyPairName
+      IamInstanceProfile: !Ref BastionHostInstanceProfile
       SecurityGroupIds:
         - !Ref BastionSecurityGroup
       SubnetId: !Ref PublicSubnet1
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          yum install -y amazon-ssm-agent
+          systemctl enable amazon-ssm-agent
+          systemctl start amazon-ssm-agent
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName}-BastionHost"
