@@ -438,6 +438,11 @@ Resources:
           ToPort: 80
           CidrIp: 0.0.0.0/0
           Description: HTTP outbound for package updates
+        - IpProtocol: tcp
+          FromPort: !Ref DBPort
+          ToPort: !Ref DBPort
+          CidrIp: !Ref VPCCIDR
+          Description: Database access
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName}-BastionSG"
@@ -488,7 +493,13 @@ Resources:
         - IpProtocol: tcp
           FromPort: !Ref DBPort
           ToPort: !Ref DBPort
+          SourceSecurityGroupId: !If [EnableBastionAccess, !Ref BastionSecurityGroup, !Ref "AWS::NoValue"]
+          Description: Access from bastion host
+        - IpProtocol: tcp
+          FromPort: !Ref DBPort
+          ToPort: !Ref DBPort
           CidrIp: !Ref VPCCIDR
+          Description: Access from VPC (fallback when no bastion)
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName}-DatabaseSG"
