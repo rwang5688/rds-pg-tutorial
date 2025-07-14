@@ -321,10 +321,10 @@ Parameters:
     Type: String
     Default: 16.9
     AllowedValues:
-      - 14.16
-      - 15.11
+      - 14.18
+      - 15.13
       - 16.9
-      - 17.3
+      - 17.5
   DBExportLogToCloudwatch:
     Default: ''
     Description: Specify the comma-delimited list of database logs (postgresql, upgrade) to export to CloudWatch Logs.
