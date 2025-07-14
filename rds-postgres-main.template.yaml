@@ -319,25 +319,16 @@ Parameters:
   DBEngineVersion:
     Description: Select Database Engine Version.
     Type: String
-    Default: 16.6
+    Default: 16.8
     AllowedValues:
-      - 12.20
-      - 12.21
-      - 12.22
-      - 13.16
-      - 13.17
       - 13.18
-      - 14.13
-      - 14.14
+      - 13.19
       - 14.15
-      - 15.8
-      - 15.9
       - 15.10
-      - 16.4
-      - 16.5
-      - 16.6
-      - 17.1
+      - 16.7
+      - 16.8
       - 17.2
+      - 17.3
   DBExportLogToCloudwatch:
     Default: ''
     Description: Specify the comma-delimited list of database logs (postgresql, upgrade) to export to CloudWatch Logs.
