@@ -311,7 +311,7 @@ Parameters:
     Description: "Select 'true' to set up auto minor version upgrade."
     Type: String
   DBBackupRetentionPeriod:
-    Default: 35
+    Default: 7
     Description: "The number of days for which automatic database snapshots are retained."
     Type: Number
     MinValue: 0
